@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,7 +29,6 @@ public class JobPosting {
     private String detail;
     private String skill;
 
-    @Builder
     public JobPosting(Company company, String position, Integer reward, String detail, String skill) {
         setCompany(company);
         this.position = position;
@@ -45,5 +43,21 @@ public class JobPosting {
         }
         this.company = company;
         company.getJobPostings().add(this);
+    }
+
+    public void changePosition(String position) {
+        this.position = position;
+    }
+
+    public void changeReward(Integer reward) {
+        this.reward = reward;
+    }
+
+    public void changeDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public void changeSkill(String skill) {
+        this.skill = skill;
     }
 }

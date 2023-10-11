@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,16 +21,15 @@ public class Company {
     private Long id;
 
     private String name;
-    private String Nationality;
-    private String Region;
+    private String nationality;
+    private String region;
 
     @OneToMany
     private List<JobPosting> jobPostings = new ArrayList<>();
 
-    @Builder
     public Company(String name, String nationality, String region) {
         this.name = name;
-        Nationality = nationality;
-        Region = region;
+        this.nationality = nationality;
+        this.region = region;
     }
 }

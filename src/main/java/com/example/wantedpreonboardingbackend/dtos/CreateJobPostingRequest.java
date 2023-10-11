@@ -2,13 +2,13 @@ package com.example.wantedpreonboardingbackend.dtos;
 
 import com.example.wantedpreonboardingbackend.domains.Company;
 import com.example.wantedpreonboardingbackend.domains.JobPosting;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@NoArgsConstructor
 public class CreateJobPostingRequest {
     private Long company_id;
     private String position;
@@ -20,7 +20,6 @@ public class CreateJobPostingRequest {
         return new JobPosting(company, position, reward, detail, skill);
     }
 
-    @Builder
     public CreateJobPostingRequest(Long company_id, String position, Integer reward, String detail, String skill) {
         this.company_id = company_id;
         this.position = position;

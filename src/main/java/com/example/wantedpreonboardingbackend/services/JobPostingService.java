@@ -3,6 +3,7 @@ package com.example.wantedpreonboardingbackend.services;
 import com.example.wantedpreonboardingbackend.domains.Company;
 import com.example.wantedpreonboardingbackend.domains.JobPosting;
 import com.example.wantedpreonboardingbackend.dtos.CreateJobPostingRequest;
+import com.example.wantedpreonboardingbackend.dtos.PatchJobPostingRequest;
 import com.example.wantedpreonboardingbackend.repositories.CompanyRepository;
 import com.example.wantedpreonboardingbackend.repositories.JobPostingRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,23 @@ public class JobPostingService {
 
         JobPosting jobPosting = request.toJobPosting(company);
         jobPostingRepository.save(jobPosting);
+    }
+
+    public void patchJobPosting(Long jobPostingId, PatchJobPostingRequest request) {
+        JobPosting jobPosting = jobPostingRepository.findById(jobPostingId)
+                .orElseThrow(() -> new RuntimeException());// TODO: Exception 추가, 처리 로직 추가
+
+        if (request.getPosition() != null) {
+            jobPosting.changePosition(request.getPosition());
+        }
+        if (request.getReward() != null) {
+            jobPosting.changeReward(request.getReward());
+        }
+        if (request.getDetail() != null) {
+            jobPosting.changeDetail(request.getDetail());
+        }
+        if (request.getSkill() != null) {
+            jobPosting.changeSkill(request.getSkill());
+        }
     }
 }
