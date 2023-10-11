@@ -6,9 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 @Entity
 public class JobPosting {
 
@@ -21,7 +26,24 @@ public class JobPosting {
     private Company company;
 
     private String position;
-    private BigDecimal reward;
+    private Integer reward;
     private String detail;
     private String skill;
+
+    @Builder
+    public JobPosting(Company company, String position, Integer reward, String detail, String skill) {
+        setCompany(company);
+        this.position = position;
+        this.reward = reward;
+        this.detail = detail;
+        this.skill = skill;
+    }
+
+    public void setCompany(Company company) {
+        if (this.company != null) {
+            this.company.getJobPostings().remove(this);
+        }
+        this.company = company;
+        company.getJobPostings().add(this);
+    }
 }
