@@ -53,8 +53,8 @@ public class JobPostingService {
         jobPostingRepository.deleteById(jobPostingId);
     }
 
-    public GetJobPostingsResponse getJobPostings() {
-        List<JobPosting> jobPostings = jobPostingRepository.findAll(); // TODO: fetch join 검토
+    public GetJobPostingsResponse getJobPostings(String search) {
+        List<JobPosting> jobPostings = search == null ? jobPostingRepository.findAll() : jobPostingRepository.findContaining(search);
         List<JobPostingDto> jobPostingDtos = jobPostings.stream().map(JobPostingDto::from).toList();
         return new GetJobPostingsResponse(jobPostingDtos);
     }

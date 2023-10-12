@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -228,6 +229,50 @@ class JobPostingControllerIntegrationTest {
 
         assertThat(actualDtos).usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyInAnyOrderElementsOf(expectedDtos);
+    }
+
+    @DisplayName("채용공고 목록 조회 성공 - 검색어 지정")
+    @ParameterizedTest
+    @MethodSource("getJobPostingsWithQueryArgumentsProvider")
+    @DirtiesContext
+    void getJobPostingsWithQuery(String query, List<Integer> expectedIndex) throws Exception {
+        Company company1 = createCompany("원티드랩", "한국", "서울");
+        JobPosting jobPosting1 = createJobPosting(company1, "포지션1", 10000, "설명1", "Java");
+        JobPosting jobPosting2 = createJobPosting(company1, "포지션2", 20000, "설명2", "Python");
+
+        Company company2 = createCompany("원티드코리아", "한국", "부산");
+        JobPosting jobPosting3 = createJobPosting(company2, "포지션3", 30000, "설명3", "Java");
+        JobPosting jobPosting4 = createJobPosting(company2, "포지션4", 40000, "설명4", "Python");
+
+        MvcResult mvcResult = mockMvc.perform(get("/job-postings")
+                        .queryParam("search", query)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jobPostings.size()").value(2))
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        GetJobPostingsResponse response = objectMapper.readValue(content, GetJobPostingsResponse.class);
+        List<JobPostingDto> actualDtos = response.getJobPostings();
+
+        List<JobPosting> allJobPostings = List.of(jobPosting1, jobPosting2, jobPosting3, jobPosting4);
+        List<JobPosting> expectedJobPostings = new ArrayList<>();
+        for (Integer num : expectedIndex) {
+            expectedJobPostings.add(allJobPostings.get(num));
+        }
+        List<JobPostingDto> expectedDtos = expectedJobPostings.stream()
+                .map(JobPostingDto::from).toList();
+
+        assertThat(actualDtos).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(expectedDtos);
+    }
+
+    static Stream<Arguments> getJobPostingsWithQueryArgumentsProvider() {
+        return Stream.of(
+                Arguments.of("부산", List.of(2, 3)),
+                Arguments.of("Java", List.of(0, 2))
+        );
     }
 
     private Company createCompany(String name, String nationality, String region) {
