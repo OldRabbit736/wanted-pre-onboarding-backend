@@ -43,7 +43,7 @@ class JobPostingControllerIntegrationTest {
 
     @DisplayName("채용공고 등록 성공")
     @Test
-    void createJobPostingEndpoint() throws Exception {
+    void createJobPostingSuccess() throws Exception {
         Company company = createCompany();
         CreateJobPostingRequest request = getCreateJobPostingRequest(company.getId());
 
@@ -64,11 +64,31 @@ class JobPostingControllerIntegrationTest {
         assertThat(jobPosting.getReward()).isEqualTo(request.getReward());
     }
 
+    @DisplayName("채용공고 등록 실패 - 존재하지 않는 회사 아이디로 요청")
+    @Test
+    void createJobPostingFailed() throws Exception {
+        Company company = createCompany();
+        Long companyId = company.getId() + 1;
+        CreateJobPostingRequest request = getCreateJobPostingRequest(companyId);
+
+        mockMvc.perform(post("/job-postings")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("E1000"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 리소스입니다."));
+
+        List<JobPosting> all = jobPostingRepository.findAll();
+        assertThat(all.size()).isEqualTo(0);
+    }
+
     @DisplayName("원하는 채용공고 필드 수정 성공")
     @ParameterizedTest
     @MethodSource("patchJobPostingEndpointArgumentsProvider")
     @DirtiesContext
-    void patchJobPostingEndpoint(TestArg originalPost, TestArg patchPost, TestArg expectedPost) throws Exception {
+    void patchJobPostingSuccess(TestArg originalPost, TestArg patchPost, TestArg expectedPost) throws Exception {
         Company company = createCompany();
         JobPosting jobPosting = createJobPosting(company, originalPost.position, originalPost.reward, originalPost.detail, originalPost.skill);
 
@@ -89,6 +109,34 @@ class JobPostingControllerIntegrationTest {
         assertThat(patchedJobPosting.getReward()).isEqualTo(expectedPost.reward);
         assertThat(patchedJobPosting.getDetail()).isEqualTo(expectedPost.detail);
         assertThat(patchedJobPosting.getReward()).isEqualTo(expectedPost.reward);
+    }
+
+    @DisplayName("원하는 채용공고 필드 수정 실패 - 존재하지 않는 채용공고 아이디로 요청")
+    @Test
+    void patchJobPostingFailed() throws Exception {
+        Company company = createCompany();
+        JobPosting jobPosting = createJobPosting(company, "포지션1", 10000, "설명1", "기술1");
+
+        PatchJobPostingRequest request = new PatchJobPostingRequest("포지션2", 20000, "설명2", "기술2");
+
+        Long jobPostingId = jobPosting.getId() + 1;
+        mockMvc.perform(patch("/job-postings/{id}", jobPostingId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("E1000"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 리소스입니다."));
+
+        List<JobPosting> all = jobPostingRepository.findAll();
+        assertThat(all.size()).isEqualTo(1);
+
+        JobPosting originalPosting = all.get(0);
+        assertThat(originalPosting.getPosition()).isEqualTo(jobPosting.getPosition());
+        assertThat(originalPosting.getReward()).isEqualTo(jobPosting.getReward());
+        assertThat(originalPosting.getDetail()).isEqualTo(jobPosting.getDetail());
+        assertThat(originalPosting.getReward()).isEqualTo(jobPosting.getReward());
     }
 
     @RequiredArgsConstructor

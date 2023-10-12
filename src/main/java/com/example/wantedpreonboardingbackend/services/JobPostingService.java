@@ -4,6 +4,7 @@ import com.example.wantedpreonboardingbackend.domains.Company;
 import com.example.wantedpreonboardingbackend.domains.JobPosting;
 import com.example.wantedpreonboardingbackend.dtos.CreateJobPostingRequest;
 import com.example.wantedpreonboardingbackend.dtos.PatchJobPostingRequest;
+import com.example.wantedpreonboardingbackend.exceptionHandlers.CustomException;
 import com.example.wantedpreonboardingbackend.repositories.CompanyRepository;
 import com.example.wantedpreonboardingbackend.repositories.JobPostingRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class JobPostingService {
 
     public void createJobPosting(CreateJobPostingRequest request) {
         Company company = companyRepository.findById(request.getCompany_id())
-                .orElseThrow(() -> new RuntimeException());// TODO: Exception 추가, 처리 로직 추가
+                .orElseThrow(() -> new CustomException(CustomException.ExceptionCode.E1000));
 
         JobPosting jobPosting = request.toJobPosting(company);
         jobPostingRepository.save(jobPosting);
@@ -28,7 +29,7 @@ public class JobPostingService {
 
     public void patchJobPosting(Long jobPostingId, PatchJobPostingRequest request) {
         JobPosting jobPosting = jobPostingRepository.findById(jobPostingId)
-                .orElseThrow(() -> new RuntimeException());// TODO: Exception 추가, 처리 로직 추가
+                .orElseThrow(() -> new CustomException(CustomException.ExceptionCode.E1000));
 
         if (request.getPosition() != null) {
             jobPosting.changePosition(request.getPosition());
