@@ -6,6 +6,7 @@ import com.example.wantedpreonboardingbackend.services.JobPostingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,5 +29,11 @@ public class JobPostingController {
     @PatchMapping("/job-postings/{id}")
     public void patchJobPosting(@PathVariable("id") Long jobPostingId, @RequestBody PatchJobPostingRequest request) {
         jobPostingService.patchJobPosting(jobPostingId, request);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/job-postings/{id}")
+    public void deleteJobPosting(@PathVariable("id") Long jobPostingId) {
+        jobPostingService.deleteJobPosting(jobPostingId);
     }
 }

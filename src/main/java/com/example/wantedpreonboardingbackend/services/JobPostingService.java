@@ -44,4 +44,8 @@ public class JobPostingService {
             jobPosting.changeSkill(request.getSkill());
         }
     }
+
+    public void deleteJobPosting(Long jobPostingId) {
+        jobPostingRepository.deleteById(jobPostingId);
+    }
 }

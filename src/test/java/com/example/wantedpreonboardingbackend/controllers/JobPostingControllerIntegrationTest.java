@@ -181,6 +181,21 @@ class JobPostingControllerIntegrationTest {
         );
     }
 
+    @DisplayName("채용공고 삭제 성공")
+    @Test
+    void deleteJobPostingSuccess() throws Exception {
+        Company company = createCompany();
+        JobPosting jobPosting = createJobPosting(company, "포지션1", 10000, "설명1", "기술1");
+
+        mockMvc.perform(delete("/job-postings/{id}", jobPosting.getId())
+                )
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        List<JobPosting> all = jobPostingRepository.findAll();
+        assertThat(all.size()).isEqualTo(0);
+    }
+
     private Company createCompany() {
         Company company = new Company("원티드랩", "한국", "서울");
         return companyRepository.save(company);
