@@ -3,6 +3,8 @@ package com.example.wantedpreonboardingbackend.services;
 import com.example.wantedpreonboardingbackend.domains.Company;
 import com.example.wantedpreonboardingbackend.domains.JobPosting;
 import com.example.wantedpreonboardingbackend.dtos.CreateJobPostingRequest;
+import com.example.wantedpreonboardingbackend.dtos.GetJobPostingsResponse;
+import com.example.wantedpreonboardingbackend.dtos.JobPostingDto;
 import com.example.wantedpreonboardingbackend.dtos.PatchJobPostingRequest;
 import com.example.wantedpreonboardingbackend.exceptionHandlers.CustomException;
 import com.example.wantedpreonboardingbackend.repositories.CompanyRepository;
@@ -10,6 +12,8 @@ import com.example.wantedpreonboardingbackend.repositories.JobPostingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Transactional
 @RequiredArgsConstructor
@@ -47,5 +51,11 @@ public class JobPostingService {
 
     public void deleteJobPosting(Long jobPostingId) {
         jobPostingRepository.deleteById(jobPostingId);
+    }
+
+    public GetJobPostingsResponse getJobPostings() {
+        List<JobPosting> jobPostings = jobPostingRepository.findAll(); // TODO: fetch join 검토
+        List<JobPostingDto> jobPostingDtos = jobPostings.stream().map(JobPostingDto::from).toList();
+        return new GetJobPostingsResponse(jobPostingDtos);
     }
 }

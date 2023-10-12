@@ -1,20 +1,22 @@
 package com.example.wantedpreonboardingbackend.controllers;
 
 import com.example.wantedpreonboardingbackend.dtos.CreateJobPostingRequest;
+import com.example.wantedpreonboardingbackend.dtos.GetJobPostingsResponse;
 import com.example.wantedpreonboardingbackend.dtos.PatchJobPostingRequest;
 import com.example.wantedpreonboardingbackend.services.JobPostingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class JobPostingController {
 
     private final JobPostingService jobPostingService;
@@ -35,5 +37,11 @@ public class JobPostingController {
     @DeleteMapping("/job-postings/{id}")
     public void deleteJobPosting(@PathVariable("id") Long jobPostingId) {
         jobPostingService.deleteJobPosting(jobPostingId);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(value = "/job-postings", produces = "application/json; charset=utf8")
+    public GetJobPostingsResponse getJobPostings() {
+        return jobPostingService.getJobPostings();
     }
 }

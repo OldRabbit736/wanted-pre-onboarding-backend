@@ -3,6 +3,8 @@ package com.example.wantedpreonboardingbackend.controllers;
 import com.example.wantedpreonboardingbackend.domains.Company;
 import com.example.wantedpreonboardingbackend.domains.JobPosting;
 import com.example.wantedpreonboardingbackend.dtos.CreateJobPostingRequest;
+import com.example.wantedpreonboardingbackend.dtos.GetJobPostingsResponse;
+import com.example.wantedpreonboardingbackend.dtos.JobPostingDto;
 import com.example.wantedpreonboardingbackend.dtos.PatchJobPostingRequest;
 import com.example.wantedpreonboardingbackend.repositories.CompanyRepository;
 import com.example.wantedpreonboardingbackend.repositories.JobPostingRepository;
@@ -19,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -28,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
 class JobPostingControllerIntegrationTest {
@@ -44,7 +49,7 @@ class JobPostingControllerIntegrationTest {
     @DisplayName("채용공고 등록 성공")
     @Test
     void createJobPostingSuccess() throws Exception {
-        Company company = createCompany();
+        Company company = createCompany("원티드랩", "한국", "서울");
         CreateJobPostingRequest request = getCreateJobPostingRequest(company.getId());
 
         mockMvc.perform(post("/job-postings")
@@ -67,7 +72,7 @@ class JobPostingControllerIntegrationTest {
     @DisplayName("채용공고 등록 실패 - 존재하지 않는 회사 아이디로 요청")
     @Test
     void createJobPostingFailed() throws Exception {
-        Company company = createCompany();
+        Company company = createCompany("원티드랩", "한국", "서울");
         Long companyId = company.getId() + 1;
         CreateJobPostingRequest request = getCreateJobPostingRequest(companyId);
 
@@ -89,7 +94,7 @@ class JobPostingControllerIntegrationTest {
     @MethodSource("patchJobPostingEndpointArgumentsProvider")
     @DirtiesContext
     void patchJobPostingSuccess(TestArg originalPost, TestArg patchPost, TestArg expectedPost) throws Exception {
-        Company company = createCompany();
+        Company company = createCompany("원티드랩", "한국", "서울");
         JobPosting jobPosting = createJobPosting(company, originalPost.position, originalPost.reward, originalPost.detail, originalPost.skill);
 
         PatchJobPostingRequest request = new PatchJobPostingRequest(patchPost.position, patchPost.reward, patchPost.detail, patchPost.skill);
@@ -109,34 +114,6 @@ class JobPostingControllerIntegrationTest {
         assertThat(patchedJobPosting.getReward()).isEqualTo(expectedPost.reward);
         assertThat(patchedJobPosting.getDetail()).isEqualTo(expectedPost.detail);
         assertThat(patchedJobPosting.getReward()).isEqualTo(expectedPost.reward);
-    }
-
-    @DisplayName("원하는 채용공고 필드 수정 실패 - 존재하지 않는 채용공고 아이디로 요청")
-    @Test
-    void patchJobPostingFailed() throws Exception {
-        Company company = createCompany();
-        JobPosting jobPosting = createJobPosting(company, "포지션1", 10000, "설명1", "기술1");
-
-        PatchJobPostingRequest request = new PatchJobPostingRequest("포지션2", 20000, "설명2", "기술2");
-
-        Long jobPostingId = jobPosting.getId() + 1;
-        mockMvc.perform(patch("/job-postings/{id}", jobPostingId)
-                        .content(objectMapper.writeValueAsString(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andDo(print())
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code").value("E1000"))
-                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 리소스입니다."));
-
-        List<JobPosting> all = jobPostingRepository.findAll();
-        assertThat(all.size()).isEqualTo(1);
-
-        JobPosting originalPosting = all.get(0);
-        assertThat(originalPosting.getPosition()).isEqualTo(jobPosting.getPosition());
-        assertThat(originalPosting.getReward()).isEqualTo(jobPosting.getReward());
-        assertThat(originalPosting.getDetail()).isEqualTo(jobPosting.getDetail());
-        assertThat(originalPosting.getReward()).isEqualTo(jobPosting.getReward());
     }
 
     @RequiredArgsConstructor
@@ -181,10 +158,38 @@ class JobPostingControllerIntegrationTest {
         );
     }
 
+    @DisplayName("원하는 채용공고 필드 수정 실패 - 존재하지 않는 채용공고 아이디로 요청")
+    @Test
+    void patchJobPostingFailed() throws Exception {
+        Company company = createCompany("원티드랩", "한국", "서울");
+        JobPosting jobPosting = createJobPosting(company, "포지션1", 10000, "설명1", "기술1");
+
+        PatchJobPostingRequest request = new PatchJobPostingRequest("포지션2", 20000, "설명2", "기술2");
+
+        Long jobPostingId = jobPosting.getId() + 1;
+        mockMvc.perform(patch("/job-postings/{id}", jobPostingId)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("E1000"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 리소스입니다."));
+
+        List<JobPosting> all = jobPostingRepository.findAll();
+        assertThat(all.size()).isEqualTo(1);
+
+        JobPosting originalPosting = all.get(0);
+        assertThat(originalPosting.getPosition()).isEqualTo(jobPosting.getPosition());
+        assertThat(originalPosting.getReward()).isEqualTo(jobPosting.getReward());
+        assertThat(originalPosting.getDetail()).isEqualTo(jobPosting.getDetail());
+        assertThat(originalPosting.getReward()).isEqualTo(jobPosting.getReward());
+    }
+
     @DisplayName("채용공고 삭제 성공")
     @Test
     void deleteJobPostingSuccess() throws Exception {
-        Company company = createCompany();
+        Company company = createCompany("원티드랩", "한국", "서울");
         JobPosting jobPosting = createJobPosting(company, "포지션1", 10000, "설명1", "기술1");
 
         mockMvc.perform(delete("/job-postings/{id}", jobPosting.getId())
@@ -196,8 +201,37 @@ class JobPostingControllerIntegrationTest {
         assertThat(all.size()).isEqualTo(0);
     }
 
-    private Company createCompany() {
-        Company company = new Company("원티드랩", "한국", "서울");
+    @DisplayName("채용공고 목록 조회 성공")
+    @Test
+    void getJobPostings() throws Exception {
+        Company company1 = createCompany("원티드랩", "한국", "서울");
+        JobPosting jobPosting1 = createJobPosting(company1, "포지션1", 10000, "설명1", "기술1");
+        JobPosting jobPosting2 = createJobPosting(company1, "포지션2", 20000, "설명2", "기술2");
+
+        Company company2 = createCompany("원티드코리아", "한국", "부산");
+        JobPosting jobPosting3 = createJobPosting(company2, "포지션3", 30000, "설명3", "기술3");
+        JobPosting jobPosting4 = createJobPosting(company2, "포지션4", 40000, "설명4", "기술4");
+
+        MvcResult mvcResult = mockMvc.perform(get("/job-postings")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jobPostings.size()").value(4))
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        GetJobPostingsResponse response = objectMapper.readValue(content, GetJobPostingsResponse.class);
+        List<JobPostingDto> actualDtos = response.getJobPostings();
+
+        List<JobPostingDto> expectedDtos = Stream.of(jobPosting1, jobPosting2, jobPosting3, jobPosting4)
+                .map(JobPostingDto::from).toList();
+
+        assertThat(actualDtos).usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(expectedDtos);
+    }
+
+    private Company createCompany(String name, String nationality, String region) {
+        Company company = new Company(name, nationality, region);
         return companyRepository.save(company);
     }
 

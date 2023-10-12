@@ -24,7 +24,7 @@ public class Company {
     private String nationality;
     private String region;
 
-    @OneToMany
+    @OneToMany(mappedBy = "company")
     private List<JobPosting> jobPostings = new ArrayList<>();
 
     public Company(String name, String nationality, String region) {
