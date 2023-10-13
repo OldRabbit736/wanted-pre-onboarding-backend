@@ -208,23 +208,25 @@ class JobPostingControllerIntegrationTest {
         Company company1 = createCompany("원티드랩", "한국", "서울");
         JobPosting jobPosting1 = createJobPosting(company1, "포지션1", 10000, "설명1", "기술1");
         JobPosting jobPosting2 = createJobPosting(company1, "포지션2", 20000, "설명2", "기술2");
+        JobPosting jobPosting3 = createJobPosting(company1, "포지션3", 30000, "설명3", "기술3");
 
         Company company2 = createCompany("원티드코리아", "한국", "부산");
-        JobPosting jobPosting3 = createJobPosting(company2, "포지션3", 30000, "설명3", "기술3");
         JobPosting jobPosting4 = createJobPosting(company2, "포지션4", 40000, "설명4", "기술4");
+        JobPosting jobPosting5 = createJobPosting(company2, "포지션5", 50000, "설명5", "기술5");
+        JobPosting jobPosting6 = createJobPosting(company2, "포지션6", 60000, "설명6", "기술6");
 
         MvcResult mvcResult = mockMvc.perform(get("/job-postings")
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.jobPostings.size()").value(4))
+                .andExpect(jsonPath("$.jobPostings.size()").value(6))
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
         GetJobPostingsResponse response = objectMapper.readValue(content, GetJobPostingsResponse.class);
         List<JobPostingDto> actualDtos = response.getJobPostings();
 
-        List<JobPostingDto> expectedDtos = Stream.of(jobPosting1, jobPosting2, jobPosting3, jobPosting4)
+        List<JobPostingDto> expectedDtos = Stream.of(jobPosting1, jobPosting2, jobPosting3, jobPosting4, jobPosting5, jobPosting6)
                 .map(JobPostingDto::from).toList();
 
         assertThat(actualDtos).usingRecursiveFieldByFieldElementComparator()
@@ -239,24 +241,26 @@ class JobPostingControllerIntegrationTest {
         Company company1 = createCompany("원티드랩", "한국", "서울");
         JobPosting jobPosting1 = createJobPosting(company1, "포지션1", 10000, "설명1", "Java");
         JobPosting jobPosting2 = createJobPosting(company1, "포지션2", 20000, "설명2", "Python");
+        JobPosting jobPosting3 = createJobPosting(company1, "포지션3", 30000, "설명3", "Java");
 
         Company company2 = createCompany("원티드코리아", "한국", "부산");
-        JobPosting jobPosting3 = createJobPosting(company2, "포지션3", 30000, "설명3", "Java");
         JobPosting jobPosting4 = createJobPosting(company2, "포지션4", 40000, "설명4", "Python");
+        JobPosting jobPosting5 = createJobPosting(company2, "포지션5", 50000, "설명5", "Java");
+        JobPosting jobPosting6 = createJobPosting(company2, "포지션6", 60000, "설명6", "Python");
 
         MvcResult mvcResult = mockMvc.perform(get("/job-postings")
                         .queryParam("search", query)
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.jobPostings.size()").value(2))
+                .andExpect(jsonPath("$.jobPostings.size()").value(expectedIndex.size()))
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
         GetJobPostingsResponse response = objectMapper.readValue(content, GetJobPostingsResponse.class);
         List<JobPostingDto> actualDtos = response.getJobPostings();
 
-        List<JobPosting> allJobPostings = List.of(jobPosting1, jobPosting2, jobPosting3, jobPosting4);
+        List<JobPosting> allJobPostings = List.of(jobPosting1, jobPosting2, jobPosting3, jobPosting4, jobPosting5, jobPosting6);
         List<JobPosting> expectedJobPostings = new ArrayList<>();
         for (Integer num : expectedIndex) {
             expectedJobPostings.add(allJobPostings.get(num));
@@ -270,8 +274,8 @@ class JobPostingControllerIntegrationTest {
 
     static Stream<Arguments> getJobPostingsWithQueryArgumentsProvider() {
         return Stream.of(
-                Arguments.of("부산", List.of(2, 3)),
-                Arguments.of("Java", List.of(0, 2))
+                Arguments.of("부산", List.of(3, 4, 5)),
+                Arguments.of("Java", List.of(0, 2, 4))
         );
     }
 
