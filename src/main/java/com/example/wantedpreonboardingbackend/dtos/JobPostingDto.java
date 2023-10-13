@@ -19,6 +19,7 @@ public class JobPostingDto {
     private final String position;
     private final Integer reward;
     private final String skill;
+    private final String detail;
     private final List<Long> anotherJobPostingIds;
 
     public static JobPostingDto from(JobPosting jobPosting) {
@@ -27,7 +28,7 @@ public class JobPostingDto {
         return new JobPostingDto(
                 jobPosting.getId(), company.getName(), company.getNationality(),
                 company.getRegion(), jobPosting.getPosition(), jobPosting.getReward(),
-                jobPosting.getSkill(), anotherJobPostingIds
+                jobPosting.getSkill(), jobPosting.getDetail(), anotherJobPostingIds
         );
     }
 
