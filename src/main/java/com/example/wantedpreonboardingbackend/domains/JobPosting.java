@@ -1,5 +1,6 @@
 package com.example.wantedpreonboardingbackend.domains;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,15 +26,19 @@ public class JobPosting {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
     @OneToMany(mappedBy = "jobPosting")
     private List<Apply> applies = new ArrayList<>();
 
+    @Column(nullable = false)
     private String position;
+    @Column(nullable = false)
     private Integer reward;
+    @Column(nullable = false)
     private String detail;
+    @Column(nullable = false)
     private String skill;
 
     public JobPosting(Company company, String position, Integer reward, String detail, String skill) {

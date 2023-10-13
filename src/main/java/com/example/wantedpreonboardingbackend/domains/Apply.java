@@ -20,11 +20,11 @@ public class Apply {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "job_posting_id")
+    @JoinColumn(name = "job_posting_id", nullable = false)
     private JobPosting jobPosting;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     public Apply(JobPosting jobPosting, Member member) {
