@@ -54,7 +54,7 @@ public class JobPostingService {
     }
 
     public GetJobPostingsResponse getJobPostings(String search) {
-        List<JobPosting> jobPostings = search == null ? jobPostingRepository.findAll() : jobPostingRepository.findContaining(search);
+        List<JobPosting> jobPostings = search == null ? jobPostingRepository.findWithCompany() : jobPostingRepository.findWithCompanyContaining(search);
         List<JobPostingDto> jobPostingDtos = jobPostings.stream().map(JobPostingDto::from).toList();
         return new GetJobPostingsResponse(jobPostingDtos);
     }
