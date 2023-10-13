@@ -2,9 +2,11 @@ package com.example.wantedpreonboardingbackend.utilities;
 
 import com.example.wantedpreonboardingbackend.domains.Company;
 import com.example.wantedpreonboardingbackend.domains.JobPosting;
+import com.example.wantedpreonboardingbackend.domains.Member;
 import com.example.wantedpreonboardingbackend.dtos.CreateJobPostingRequest;
 import com.example.wantedpreonboardingbackend.repositories.CompanyRepository;
 import com.example.wantedpreonboardingbackend.repositories.JobPostingRepository;
+import com.example.wantedpreonboardingbackend.repositories.MemberRepository;
 
 public class TestUtils {
     public static Company createCompany(CompanyRepository companyRepository, String name, String nationality, String region) {
@@ -15,6 +17,10 @@ public class TestUtils {
     public static JobPosting createJobPosting(JobPostingRepository jobPostingRepository, Company company, String position, Integer reward, String detail, String skill) {
         JobPosting jobPosting = new JobPosting(company, position, reward, detail, skill);
         return jobPostingRepository.save(jobPosting);
+    }
+
+    public static Member getMember(MemberRepository memberRepository, String name) {
+        return memberRepository.save(new Member(name));
     }
 
     public static CreateJobPostingRequest getCreateJobPostingRequest(Long companyId) {

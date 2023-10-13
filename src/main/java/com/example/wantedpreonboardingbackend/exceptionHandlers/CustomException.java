@@ -21,7 +21,9 @@ public class CustomException extends RuntimeException {
 
     @Getter
     public enum ExceptionCode {
-        E1000("존재하지 않는 리소스입니다.", 404);
+        E1000("존재하지 않는 리소스입니다.", 404),
+        E1001("이미 해당 공고에 지원했습니다. 중복해서 지원할 수 없습니다.", 409)
+        ;
 
         private final String code;
         private final String message;
