@@ -95,7 +95,9 @@
 ## Git commit 메시지 컨벤션
 - [udacity 스타일](https://udacity.github.io/git-styleguide/)을 따랐습니다.
 
-## 테스트 구조
+## 테스트 패키지 구조
 - Integration Tests
-    - controllers/...IntegrationTest.java 파일 이름 컨벤션을 갖습니다.
-    - API 모든 엔드포인트를 대상으로 작성되었습니다.
+  - tests 패키지 내부에 ...IntegrationTest.java 파일 이름 컨벤션을 갖습니다.
+  - API 모든 엔드포인트를 대상으로 작성되었습니다.
+- Unit Tests
+  - test 패키지 내부에 ...UnitTest.java 파일 이름 컨벤션을 갖습니다.
