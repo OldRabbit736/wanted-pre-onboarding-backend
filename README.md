@@ -76,7 +76,7 @@
             }
             ```
 
-- 채용공고 등록
+- 채용공고 지원
     - endpoint: `POST, /applies`
     - 성공응답
         - http status: 201
